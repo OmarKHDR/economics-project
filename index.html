@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Load Shedding Control System</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="light-mode">
+    <div class="container">
+        <header>
+            <h1>Load Shedding Control System</h1>
+            <div class="header-controls">
+                <div class="remote-control">
+                    <span>Manual Control</span>
+                    <label class="switch">
+                        <input type="checkbox" id="manual-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <i class="fas fa-sun"></i>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section class="summary-panel">
+                <h2>System Summary</h2>
+                <div class="total-load">
+                    <h3>Total Load</h3>
+                    <div class="load-value" id="total-load-value">0 W</div>
+                </div>
+                <div class="status-indicators">
+                    <div class="status-item">
+                        <div class="status-led" id="ac-status-led"></div>
+                        <span>AC Load</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-led" id="lighting-status-led"></div>
+                        <span>Lighting Load</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-led" id="heater-status-led"></div>
+                        <span>Heater Load</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="load-cards">
+                <div class="load-card" id="ac-card">
+                    <div class="card-header">
+                        <h3>AC Load</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="ac-toggle" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="card-body">
+                        <div class="load-info">
+                            <div class="load-icon">
+                                <i class="fas fa-wind"></i>
+                            </div>
+                            <div class="load-reading">
+                                <span id="ac-load-value">0 W</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="load-card" id="lighting-card">
+                    <div class="card-header">
+                        <h3>Lighting Load</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="lighting-toggle" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="card-body">
+                        <div class="load-info">
+                            <div class="load-icon">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <div class="load-reading">
+                                <span id="lighting-load-value">0 W</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="load-card" id="heater-card">
+                    <div class="card-header">
+                        <h3>Heater Load</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="heater-toggle" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="card-body">
+                        <div class="load-info">
+                            <div class="load-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="load-reading">
+                                <span id="heater-load-value">0 W</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

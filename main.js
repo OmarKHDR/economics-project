@@ -22,10 +22,14 @@ const endpoints = {
   acLoadValue: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V0",
   heaterLoadValue: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V1",
   lightingLoadValue: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V2",
-  manualMode: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V3",
-  ac: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V4",
-  heater: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V5",
-  lighting: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V6"
+  manualMode: "https://blynk.cloud/external/api/update?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V3",
+  ac: "https://blynk.cloud/external/api/update?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V4",
+  heater: "https://blynk.cloud/external/api/update?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V5",
+  lighting: "https://blynk.cloud/external/api/update?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V6",
+  manualModeStatus: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V3",
+  acStatus: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V4",
+  heaterStatus: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V5",
+  lightingStatus: "https://blynk.cloud/external/api/get?token=h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb&V6",
 }
 
 // System state
@@ -58,12 +62,13 @@ function init() {
 // Fetch initial state from server
 function fetchInitialState() {
   Promise.all([
-    fetch(endpoints.manualMode).then(res => res.text()),
-    fetch(endpoints.ac).then(res => res.text()),
-    fetch(endpoints.lighting).then(res => res.text()),
-    fetch(endpoints.heater).then(res => res.text())
+    fetch(endpoints.manualModeStatus).then(res => res.text()),
+    fetch(endpoints.acStatus).then(res => res.text()),
+    fetch(endpoints.lightingStatus).then(res => res.text()),
+    fetch(endpoints.heaterStatus).then(res => res.text())
   ])
   .then(([manualMode, ac, lighting, heater]) => {
+    console.log("initial states",manualMode, ac, lighting, heater);
     system.manualControl = manualMode === "1";
     system.loads.ac.status = ac === "1";
     system.loads.lighting.status = lighting === "1";
@@ -94,7 +99,7 @@ function toggleManualControl() {
   // API Call: Send manual control status to ESP32
   fetch(`${endpoints.manualMode}=${system.manualControl ? 1 : 0}`)
   .then(res => res.text())
-  .then(data => console.log("Setting mode succeeded: ", data))
+  .then(data => console.log("Setting mode succeeded: status", data))
   .catch(error => console.error('Error setting mode: ', error));
 }
 
@@ -121,7 +126,7 @@ function toggleLoad(loadType) {
   fetch(`${endpoints[loadType]}=${system.loads[loadType].status ? 1 : 0}`)
   .then(res => res.text())
   .then(data => {
-    console.log(`${loadType} load toggled successfully:`, data);
+    console.log(`${loadType} load toggled successfully status:`, data);
     // Refresh power values after toggle
     fetchLoadPower();
   })
@@ -146,18 +151,13 @@ function updateLoadStatus(loadType) {
 function updateTotalLoad() {
   // Convert all powers to watts for consistent calculation
   const totalPowerWatts = 
-    (system.loads.ac.status ? parseFloat(system.loads.ac.power) * 1000 : 0) + 
+    (system.loads.ac.status ? parseFloat(system.loads.ac.power) : 0) + 
     (system.loads.lighting.status ? parseFloat(system.loads.lighting.power) : 0) + 
     (system.loads.heater.status ? parseFloat(system.loads.heater.power) : 0);
   
   // Format total based on magnitude
-  let formattedTotal;
-  if (totalPowerWatts >= 1000) {
-    formattedTotal = `${(totalPowerWatts / 1000).toFixed(2)} kW`;
-  } else {
-    formattedTotal = `${Math.round(totalPowerWatts)} W`;
-  }
-  
+  let formattedTotal = `${Math.round(totalPowerWatts)} kW`;
+
   totalLoadValue.textContent = formattedTotal;
 }
 
@@ -169,7 +169,7 @@ function startPolling() {
     
     // If not in manual mode, also fetch current status
     if (!system.manualControl) {
-      fetchLoadStatus();
+      fetchInitialState();
     }
   }, 5000); // Poll every 5 seconds
 }
@@ -193,22 +193,22 @@ async function fetchPowerEndpoints() {
 }
 
 // Helper function to fetch status endpoints
-async function fetchStatusEndpoints() {
-  try {
-    const acRes = await fetch(endpoints.ac);
-    const heaterRes = await fetch(endpoints.heater);
-    const lightingRes = await fetch(endpoints.lighting);
+// async function fetchStatusEndpoints() {
+//   try {
+//     const acRes = await fetch(endpoints.ac);
+//     const heaterRes = await fetch(endpoints.heater);
+//     const lightingRes = await fetch(endpoints.lighting);
 
-    const ac = await acRes.text();
-    const heater = await heaterRes.text();
-    const lighting = await lightingRes.text();
+//     const ac = await acRes.text();
+//     const heater = await heaterRes.text();
+//     const lighting = await lightingRes.text();
 
-    return { ac, heater, lighting };
-  } catch (err) {
-    console.error("Failed to fetch one or more status values:", err);
-    return null;
-  }
-}
+//     return { ac, heater, lighting };
+//   } catch (err) {
+//     console.error("Failed to fetch one or more status values:", err);
+//     return null;
+//   }
+// }
 
 // Fetch power values from ESP32
 function fetchLoadPower() {
@@ -235,33 +235,33 @@ function fetchLoadPower() {
 }
 
 // Fetch load status from ESP32
-function fetchLoadStatus() {
-  console.log('Fetching load status values...');
+// function fetchLoadStatus() {
+//   console.log('Fetching load status values...');
   
-  fetchStatusEndpoints()
-    .then(res => {
-      if (!res) {
-        console.warn('Failed to fetch status values.');
-        return;
-      }
+//   fetchStatusEndpoints()
+//     .then(res => {
+//       if (!res) {
+//         console.warn('Failed to fetch status values.');
+//         return;
+//       }
       
-      // Update status in system state based on API responses
-      system.loads.ac.status = res.ac === "1";
-      system.loads.lighting.status = res.lighting === "1";
-      system.loads.heater.status = res.heater === "1";
+//       // Update status in system state based on API responses
+//       system.loads.ac.status = res.ac === "1";
+//       system.loads.lighting.status = res.lighting === "1";
+//       system.loads.heater.status = res.heater === "1";
       
-      // Update UI status indicators
-      updateLoadStatus('ac');
-      updateLoadStatus('lighting');
-      updateLoadStatus('heater');
+//       // Update UI status indicators
+//       updateLoadStatus('ac');
+//       updateLoadStatus('lighting');
+//       updateLoadStatus('heater');
       
-      // Recalculate total load with new status
-      updateTotalLoad();
-    })
-    .catch(err => {
-      console.error('Unexpected error in fetchLoadStatus:', err);
-    });
-}
+//       // Recalculate total load with new status
+//       updateTotalLoad();
+//     })
+//     .catch(err => {
+//       console.error('Unexpected error in fetchLoadStatus:', err);
+//     });
+// }
 
 // Update power values in system state
 function updatePowerValues(powerData) {

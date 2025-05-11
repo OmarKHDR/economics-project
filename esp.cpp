@@ -1,16 +1,14 @@
+const char *ssid = "Realme";
+const char *password = "omartarek";
+#define BLYNK_TEMPLATE_ID "TMPL4T3fOcJc0"
+#define BLYNK_TEMPLATE_NAME "final"
+#define BLYNK_AUTH_TOKEN "h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb"
 #include <Arduino.h>
 #include <Wire.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <LiquidCrystal_I2C.h>
 #include <BlynkSimpleEsp32.h>
-#include <BlynkTimer.h>
-
-const char *ssid = "Realme";
-const char *password = "omartarek";
-#define BLYNK_TEMPLATE_ID "TMPL4T3fOcJc0"
-#define BLYNK_TEMPLATE_NAME "final"
-#define BLYNK_AUTH_TOKEN "h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb"
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 const int acPin     = 33;  // A0
@@ -21,9 +19,6 @@ const int acRelay     = 27;  // Control + Digital pin in Blynk
 const int heaterRelay = 26;
 const int lightsRelay = 25;
 
-const int acLED = 13;
-const int heaterLED = 12;
-const int lightsLED = 11;
 
 const float totalThreshold = 7.5;
 const float restoreThreshold = 3.0;
@@ -70,7 +65,6 @@ void setup() {
   Serial.begin(115200);
   Serial.println("System Initializing...");
 
-  pinMode(acLED, INPUT);
   pinMode(acRelay, OUTPUT);
   pinMode(heaterRelay, OUTPUT);
   pinMode(lightsRelay, OUTPUT);
@@ -106,7 +100,7 @@ void loop() {
   lcd.print("    ");
 
   if (blynkMode) {
-    // Blynk controls the relays (no action here in your logic)
+    // Blynk controls the relays (no action here as the )
   } else {
     if (totalLoad > totalThreshold) {
       if (digitalRead(acRelay) == HIGH) {
@@ -174,7 +168,7 @@ void loop() {
     }
   }
 
-  delay(200);
+  delay(1000);
 }
 
 float updateAndRecalculate() {

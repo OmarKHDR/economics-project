@@ -12,13 +12,15 @@ const char *password = "omartarek";
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 const int acPin     = 33;  // A0
-const int heaterPin = 32;  // A1
+const int heaterPin = 32;  // A1 potentiamater
 const int lightsPin = 35;  // A2
 
 const int acRelay     = 27;  // Control + Digital pin in Blynk
-const int heaterRelay = 26;
+const int heaterRelay = 26; //led to base 
 const int lightsRelay = 25;
 
+const int potPin = 34;      // Potentiometer analog input
+const int enPin = 13;       // ENA pin connected to GPIO13 (PWM output)
 
 const float totalThreshold = 7.5;
 const float restoreThreshold = 3.0;
@@ -48,6 +50,7 @@ BLYNK_WRITE(V3) {
 BLYNK_WRITE(V4) {
   acState = param.asInt();
   digitalWrite(acRelay, acState ? HIGH : LOW);
+  
 }
 
 BLYNK_WRITE(V5) {
@@ -99,8 +102,10 @@ void loop() {
   lcd.print(totalLoad);
   lcd.print("    ");
 
+  motor_spead();
+
   if (blynkMode) {
-    // Blynk controls the relays (no action here as the )
+    
   } else {
     if (totalLoad > totalThreshold) {
       if (digitalRead(acRelay) == HIGH) {
@@ -168,7 +173,7 @@ void loop() {
     }
   }
 
-  delay(1000);
+  delay(200);
 }
 
 float updateAndRecalculate() {
@@ -176,4 +181,10 @@ float updateAndRecalculate() {
   heaterValue = analogRead(heaterPin)* (3.3 / 4095.0); // No scaling
   lightsValue = analogRead(lightsPin)* (3.3 / 4095.0); // No scaling
   return acValue + heaterValue + lightsValue;
+}
+void motor_spead(){
+  int potValue = analogRead(potPin);                  // Range: 0–4095
+  int pwmValue = map(potValue, 0, 4095, 0, 255);      // Map to 0–255
+  analogWrite(enPin, pwmValue);                       // Write PWM to motor
+  Serial.printf("Pot: %d → PWM: %d\n", potValue, pwmValue);
 }

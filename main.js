@@ -38,8 +38,8 @@ const system = {
   darkMode: false,
   loads: {
     ac: { status: false, power: 0, unit: 'kW' },
-    lighting: { status: false, power: 0, unit: 'W' },
-    heater: { status: false, power: 0, unit: 'W' }
+    lighting: { status: false, power: 0, unit: 'kW' },
+    heater: { status: false, power: 0, unit: 'kW' }
   }
 };
 

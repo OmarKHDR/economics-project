@@ -21,9 +21,9 @@ const totalLoadValue = document.getElementById('total-load-value');
 const token = "h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb";
 const endpoints = {
   values: {
-    acLoadValue: `https://blynk.cloud/external/api/get?token=${token}&V0`,
-    heaterLoadValue: `https://blynk.cloud/external/api/get?token=${token}&V1`,
-    lightingLoadValue: `https://blynk.cloud/external/api/get?token=${token}&V2`,
+    ac: `https://blynk.cloud/external/api/get?token=${token}&V0`,
+    heater: `https://blynk.cloud/external/api/get?token=${token}&V1`,
+    lighting: `https://blynk.cloud/external/api/get?token=${token}&V2`,
   },
   set: {
     manualMode: `https://blynk.cloud/external/api/update?token=${token}&V3`,
@@ -32,10 +32,10 @@ const endpoints = {
     lighting: `https://blynk.cloud/external/api/update?token=${token}&V6`,
   },
   status: {
-    manualModeStatus: `https://blynk.cloud/external/api/get?token=${token}&V3`,
-    acStatus: `https://blynk.cloud/external/api/get?token=${token}&V4`,
-    heaterStatus: `https://blynk.cloud/external/api/get?token=${token}&V5`,
-    lightingStatus: `https://blynk.cloud/external/api/get?token=${token}&V6`,
+    manualMode: `https://blynk.cloud/external/api/get?token=${token}&V3`,
+    ac: `https://blynk.cloud/external/api/get?token=${token}&V4`,
+    heater: `https://blynk.cloud/external/api/get?token=${token}&V5`,
+    lighting: `https://blynk.cloud/external/api/get?token=${token}&V6`,
   }
 }
 
@@ -75,7 +75,7 @@ function fetchInitialState() {
     fetch(endpoints.status.heater).then(res => res.text())
   ])
   .then(([manualMode, ac, lighting, heater]) => {
-    console.log("initial states",manualMode, ac, lighting, heater);
+    console.log(`initial status manual=${manualMode}, ac = ${ac}, lighting=${lighting}, heater=${heater}`);
     system.manualControl = manualMode === "1";
     system.loads.ac.status = ac === "1";
     system.loads.lighting.status = lighting === "1";

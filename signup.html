@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sign Up - Load Management System</title>
+	<link rel="stylesheet" href="assets/css/common.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="light-mode">
+	<div class="container">
+		<header>
+			<h1>Load Management System</h1>
+			<div class="header-controls">
+				<div class="theme-toggle">
+					<i class="fas fa-moon"></i>
+					<label class="switch">
+						<input type="checkbox" id="theme-toggle">
+						<span class="slider round"></span>
+					</label>
+					<i class="fas fa-sun"></i>
+				</div>
+			</div>
+		</header>
+
+		<div class="auth-container">
+			<h2 class="auth-title">Create New Account</h2>
+
+			<div class="card">
+				<div class="card-body">
+					<form id="signup-form">
+						<div id="error-message" class="error-message"
+							style="color: var(--danger-color); margin-bottom: 15px; display: none;"></div>
+
+						<div class="profile-upload">
+							<div class="profile-preview" id="profile-preview">
+								<i class="fas fa-user"></i>
+							</div>
+							<div class="file-input-wrapper">
+								<button type="button" class="btn">Choose Profile Picture</button>
+								<input type="file" id="profile-pic" accept="image/*">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="name">Full Name</label>
+							<input type="text" id="name" class="form-control" placeholder="Enter your full name"
+								required>
+						</div>
+
+						<div class="form-group">
+							<label for="email">Email</label>
+							<input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+						</div>
+
+						<div class="form-group">
+							<label for="password">Password</label>
+							<input type="password" id="password" class="form-control" placeholder="Create a password"
+								required>
+						</div>
+
+						<div class="form-group">
+							<label for="confirm-password">Confirm Password</label>
+							<input type="password" id="confirm-password" class="form-control"
+								placeholder="Confirm your password" required>
+						</div>
+
+						<div class="form-group">
+							<label for="role">Account Type</label>
+							<select id="role" class="form-control" required>
+								<option value="">Select account type</option>
+								<option value="service_provider">Service Provider</option>
+								<option value="home_user">Home User</option>
+							</select>
+						</div>
+
+						<button type="submit" class="btn" style="width: 100%;">Create Account</button>
+					</form>
+
+					<div class="form-footer">
+						<p>Already have an account? <a href="index.html">Login here</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="assets/js/auth.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			// If user is already logged in, redirect to dashboard
+			if (isLoggedIn()) {
+				redirectBasedOnRole();
+				return;
+			}
+
+			const signupForm = document.getElementById('signup-form');
+			const errorMessage = document.getElementById('error-message');
+			const profilePicInput = document.getElementById('profile-pic');
+			const profilePreview = document.getElementById('profile-preview');
+			let profilePicBase64 = null;
+
+			// Handle profile picture upload and preview
+			profilePicInput.addEventListener('change', function (e) {
+				const file = e.target.files[0];
+				if (!file) return;
+
+				const reader = new FileReader();
+				reader.onload = function (event) {
+					profilePicBase64 = event.target.result;
+					profilePreview.innerHTML = `<img src="${profilePicBase64}" alt="Profile Preview">`;
+				};
+				reader.readAsDataURL(file);
+			});
+
+			// Handle form submission
+			signupForm.addEventListener('submit', function (e) {
+				e.preventDefault();
+
+				const name = document.getElementById('name').value;
+				const email = document.getElementById('email').value;
+				const password = document.getElementById('password').value;
+				const confirmPassword = document.getElementById('confirm-password').value;
+				const role = document.getElementById('role').value;
+
+				// Validate form
+				if (password !== confirmPassword) {
+					errorMessage.textContent = 'Passwords do not match';
+					errorMessage.style.display = 'block';
+					return;
+				}
+
+				try {
+					// Register user
+					const userData = {
+						name,
+						email,
+						password,
+						role,
+						profilePic: profilePicBase64
+					};
+
+					registerUser(userData);
+
+					// Auto login
+					loginUser(email, password);
+
+					// Redirect based on role
+					redirectBasedOnRole();
+				} catch (error) {
+					// Display error message
+					errorMessage.textContent = error.message;
+					errorMessage.style.display = 'block';
+				}
+			});
+		});
+	</script>
+</body>
+
+</html>

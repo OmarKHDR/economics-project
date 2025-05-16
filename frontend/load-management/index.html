@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,10 @@
     <link rel="stylesheet" href="../assets/css/common.css">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Firebase core SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js" defer></script>
 </head>
+
 <body class="light-mode">
     <div class="container">
         <header>
@@ -30,6 +34,11 @@
                         <span class="slider round"></span>
                     </label>
                     <i class="fas fa-sun"></i>
+                </div>
+                <div class="logout-button">
+                    <button id="logout-btn" class="btn btn-small">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
                 </div>
             </div>
         </header>
@@ -120,25 +129,93 @@
             </section>
         </main>
     </div>
-    <script src="../assets/js/auth.js"></script>
-    <script src="main.js"></script>
-    <script>
-        // Additional script to enforce service provider role
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is logged in
-            if (!isLoggedIn()) {
-                window.location.href = '../index.html';
-                return;
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { getStorage } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
+
+        // Fetch Firebase config from server
+        async function initializeFirebase() {
+            try {
+                const response = await fetch('/api/firebase-config');
+                const firebaseConfig = await response.json();
+
+                // Initialize Firebase
+                window.firebaseApp = initializeApp(firebaseConfig);
+                window.firestore = getFirestore(window.firebaseApp);
+                window.storage = getStorage(window.firebaseApp);
+            } catch (error) {
+                console.error('Error initializing Firebase:', error);
+                // Handle initialization error appropriately
             }
-            
-            // Check if the user has service provider role
-            const user = getCurrentUser();
-            if (user.role !== 'service_provider') {
-                alert('You do not have permission to access this page.');
-                window.location.href = '../dashboard.html';
-                return;
+        }
+
+        // Initialize Firebase when the page loads
+        initializeFirebase();
+    </script>
+
+    <!-- Role-based protection and authentication -->
+    <script type="module">
+        import { protectServiceProviderRoute } from '../assets/js/route-protection.js';
+        import { getUserSession, logoutUser } from '../assets/js/auth.js';
+
+        // Protect this route - only service providers can access
+        protectServiceProviderRoute();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Display user info
+            const user = getUserSession();
+            const userInfoElement = document.getElementById('user-info');
+
+            if (user) {
+                userInfoElement.innerHTML = `
+                    <div class="user-avatar">
+                        ${user.profilePic ? `<img src="${user.profilePic}" alt="${user.name}">` :
+                        `<i class="fas fa-user"></i>`}
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">${user.name}</div>
+                        <div class="user-role">Service Provider</div>
+                    </div>
+                `;
             }
+
+            // Set up logout button
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function () {
+                    logoutUser();
+                });
+            }
+
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+
+            // Check saved preference
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                themeToggle.checked = true;
+            }
+
+            themeToggle.addEventListener('change', function () {
+                if (this.checked) {
+                    body.classList.remove('light-mode');
+                    body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    body.classList.remove('dark-mode');
+                    body.classList.add('light-mode');
+                    localStorage.setItem('darkMode', 'false');
+                }
+            });
         });
     </script>
+    <script src="main.js"></script>
 </body>
+
 </html>

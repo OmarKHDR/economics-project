@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Smart Home Dashboard</title>
+	<link rel="stylesheet" href="../assets/css/common.css">
+	<link rel="stylesheet" href="style.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+	<!-- Firebase core SDK -->
+	<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js" defer></script>
+</head>
+
+<body class="light-mode">
+	<div class="container">
+		<header>
+			<h1>Smart Home Dashboard</h1>
+			<div class="header-controls">
+				<div id="user-info" class="user-info">
+					<!-- User info will be populated by JS -->
+				</div>
+				<div class="theme-toggle">
+					<i class="fas fa-moon"></i>
+					<label class="switch">
+						<input type="checkbox" id="theme-toggle">
+						<span class="slider round"></span>
+					</label>
+					<i class="fas fa-sun"></i>
+				</div>
+				<div class="logout-button">
+					<button id="logout-btn" class="btn btn-small">
+						<i class="fas fa-sign-out-alt"></i> Logout
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<div class="alerts-panel">
+			<h2>Recent Alerts</h2>
+			<div class="empty-state">
+				<i class="fas fa-bell-slash"></i>
+				<p>No alerts at this time.</p>
+				<p>Your home systems are running normally.</p>
+			</div>
+		</div>
+
+		<h2>Home Sensors</h2>
+		<div class="dashboard-grid">
+			<div class="sensor-card">
+				<div class="sensor-icon">
+					<i class="fas fa-thermometer-half"></i>
+				</div>
+				<div class="sensor-info">
+					<h3>Temperature</h3>
+					<div class="sensor-value">24°C</div>
+					<div class="sensor-status status-normal">Normal</div>
+				</div>
+			</div>
+
+			<div class="sensor-card">
+				<div class="sensor-icon">
+					<i class="fas fa-tint"></i>
+				</div>
+				<div class="sensor-info">
+					<h3>Humidity</h3>
+					<div class="sensor-value">45%</div>
+					<div class="sensor-status status-normal">Normal</div>
+				</div>
+			</div>
+
+			<div class="sensor-card">
+				<div class="sensor-icon">
+					<i class="fas fa-lightbulb"></i>
+				</div>
+				<div class="sensor-info">
+					<h3>Lighting</h3>
+					<div class="sensor-value">3 Active</div>
+					<div class="sensor-status status-normal">Normal</div>
+				</div>
+			</div>
+
+			<div class="sensor-card">
+				<div class="sensor-icon">
+					<i class="fas fa-door-closed"></i>
+				</div>
+				<div class="sensor-info">
+					<h3>Door Status</h3>
+					<div class="sensor-value">Closed</div>
+					<div class="sensor-status status-normal">Secured</div>
+				</div>
+			</div>
+
+			<div class="sensor-card">
+				<div class="sensor-icon">
+					<i class="fas fa-wind"></i>
+				</div>
+				<div class="sensor-info">
+					<h3>Air Quality</h3>
+					<div class="sensor-value">Good</div>
+					<div class="sensor-status status-normal">Normal</div>
+				</div>
+			</div>
+
+			<div class="sensor-card">
+				<div class="sensor-icon">
+					<i class="fas fa-bolt"></i>
+				</div>
+				<div class="sensor-info">
+					<h3>Power Usage</h3>
+					<div class="sensor-value">2.4 kW</div>
+					<div class="sensor-status status-normal">Normal</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Firebase SDK -->
+	<script type="module">
+		import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+		import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+		import { getStorage } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
+
+		// Fetch Firebase config from server
+		async function initializeFirebase() {
+			try {
+				const response = await fetch('/api/firebase-config');
+				const firebaseConfig = await response.json();
+
+				// Initialize Firebase
+				window.firebaseApp = initializeApp(firebaseConfig);
+				window.firestore = getFirestore(window.firebaseApp);
+				window.storage = getStorage(window.firebaseApp);
+			} catch (error) {
+				console.error('Error initializing Firebase:', error);
+				// Handle initialization error appropriately
+			}
+		}
+
+		// Initialize Firebase when the page loads
+		initializeFirebase();
+	</script>
+
+	<!-- Role-based protection and authentication -->
+	<script type="module">
+		import { protectHomeUserRoute } from '../assets/js/route-protection.js';
+		import { getUserSession, logoutUser } from '../assets/js/auth.js';
+
+		// Protect this route - only home users can access
+		protectHomeUserRoute();
+
+		document.addEventListener('DOMContentLoaded', function () {
+			// Display user info
+			const user = getUserSession();
+			const userInfoElement = document.getElementById('user-info');
+
+			if (user) {
+				userInfoElement.innerHTML = `
+                    <div class="user-avatar">
+                        ${user.profilePic ? `<img src="${user.profilePic}" alt="${user.name}">` :
+						`<i class="fas fa-user"></i>`}
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">${user.name}</div>
+                        <div class="user-role">Home User</div>
+                    </div>
+                `;
+			}
+
+			// Set up logout button
+			const logoutBtn = document.getElementById('logout-btn');
+			if (logoutBtn) {
+				logoutBtn.addEventListener('click', function () {
+					logoutUser();
+				});
+			}
+
+			// Theme toggle functionality
+			const themeToggle = document.getElementById('theme-toggle');
+			const body = document.body;
+
+			// Check saved preference
+			const isDarkMode = localStorage.getItem('darkMode') === 'true';
+			if (isDarkMode) {
+				body.classList.remove('light-mode');
+				body.classList.add('dark-mode');
+				themeToggle.checked = true;
+			}
+
+			themeToggle.addEventListener('change', function () {
+				if (this.checked) {
+					body.classList.remove('light-mode');
+					body.classList.add('dark-mode');
+					localStorage.setItem('darkMode', 'true');
+				} else {
+					body.classList.remove('dark-mode');
+					body.classList.add('light-mode');
+					localStorage.setItem('darkMode', 'false');
+				}
+			});
+		});
+	</script>
+
+	<script src="main.js"></script>
+</body>
+
+</html>

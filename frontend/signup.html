@@ -7,6 +7,8 @@
 	<title>Sign Up - Load Management System</title>
 	<link rel="stylesheet" href="assets/css/common.css">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+	<!-- Firebase core SDK -->
+	<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js" defer></script>
 </head>
 
 <body class="light-mode">
@@ -87,8 +89,36 @@
 		</div>
 	</div>
 
-	<script src="assets/js/auth.js"></script>
-	<script>
+	<!-- Firebase SDK -->
+	<script type="module">
+		import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+		import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+		import { getStorage } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
+
+		// Fetch Firebase config from server
+		async function initializeFirebase() {
+			try {
+				const response = await fetch('/api/firebase-config');
+				const firebaseConfig = await response.json();
+
+				// Initialize Firebase
+				window.firebaseApp = initializeApp(firebaseConfig);
+				window.firestore = getFirestore(window.firebaseApp);
+				window.storage = getStorage(window.firebaseApp);
+			} catch (error) {
+				console.error('Error initializing Firebase:', error);
+				// Handle initialization error appropriately
+			}
+		}
+
+		// Initialize Firebase when the page loads
+		initializeFirebase();
+	</script>
+
+	<!-- Custom authentication -->
+	<script type="module">
+		import { registerUser, isLoggedIn, redirectBasedOnRole } from './assets/js/auth.js';
+
 		document.addEventListener('DOMContentLoaded', function () {
 			// If user is already logged in, redirect to dashboard
 			if (isLoggedIn()) {
@@ -116,7 +146,7 @@
 			});
 
 			// Handle form submission
-			signupForm.addEventListener('submit', function (e) {
+			signupForm.addEventListener('submit', async function (e) {
 				e.preventDefault();
 
 				const name = document.getElementById('name').value;
@@ -133,26 +163,45 @@
 				}
 
 				try {
-					// Register user
+					// Register user in Firestore
 					const userData = {
 						name,
 						email,
-						password,
+						password, // This will be hashed in the registerUser function
 						role,
 						profilePic: profilePicBase64
 					};
 
-					registerUser(userData);
-
-					// Auto login
-					loginUser(email, password);
-
-					// Redirect based on role
-					redirectBasedOnRole();
+					await registerUser(userData);
+					// If successful, redirectBasedOnRole() will be called inside registerUser
 				} catch (error) {
 					// Display error message
 					errorMessage.textContent = error.message;
 					errorMessage.style.display = 'block';
+				}
+			});
+
+			// Theme toggle functionality
+			const themeToggle = document.getElementById('theme-toggle');
+			const body = document.body;
+
+			// Check saved preference
+			const isDarkMode = localStorage.getItem('darkMode') === 'true';
+			if (isDarkMode) {
+				body.classList.remove('light-mode');
+				body.classList.add('dark-mode');
+				themeToggle.checked = true;
+			}
+
+			themeToggle.addEventListener('change', function () {
+				if (this.checked) {
+					body.classList.remove('light-mode');
+					body.classList.add('dark-mode');
+					localStorage.setItem('darkMode', 'true');
+				} else {
+					body.classList.remove('dark-mode');
+					body.classList.add('light-mode');
+					localStorage.setItem('darkMode', 'false');
 				}
 			});
 		});

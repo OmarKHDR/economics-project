@@ -17,6 +17,8 @@ const int acRelay = 27;     // Digital output to control AC relay
 const int heaterRelay = 26; // Digital output to control heater relay
 const int lightsRelay = 25; // Digital output to control lights relay
 
+const int potPin = 34; // Potentiometer pin to control speed
+const int enPin = 13;  // pwm conected to enable ENA
 /**************************************
  * LOAD MANAGEMENT CONFIGURATION
  * Thresholds and variables for the load shedding system

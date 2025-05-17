@@ -2,7 +2,6 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const { firebaseConfig } = require('./firebase.config');
 
 // Initialize Express server for local development
 const server = express();
@@ -17,10 +16,6 @@ server.use(express.json());
 // Serve static files from frontend directory
 server.use(express.static('frontend'));
 
-// Endpoint to get Firebase config
-server.get('/api/firebase-config', (req, res) => {
-  res.json(firebaseConfig);
-});
 
 // Redirect all routes to the frontend application
 server.get('*', (req, res) => {

@@ -11,15 +11,19 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "redirects": [
+      {
+        "source": "/load-management{,/**}",
+        "destination": "/index.html",
+        "type": 302
+      },
+      {
+        "source": "/smart-home{,/**}",
+        "destination": "/index.html",
+        "type": 302
+      }
+    ],
     "rewrites": [
-      {
-        "source": "/load-management/**",
-        "destination": "/load-management/index.html"
-      },
-      {
-        "source": "/smart-home/**",
-        "destination": "/smart-home/index.html"
-      },
       {
         "source": "**",
         "destination": "/index.html"

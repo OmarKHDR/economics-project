@@ -130,32 +130,6 @@
         </main>
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-        import { getStorage } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
-
-        // Fetch Firebase config from server
-        async function initializeFirebase() {
-            try {
-                const response = await fetch('/api/firebase-config');
-                const firebaseConfig = await response.json();
-
-                // Initialize Firebase
-                window.firebaseApp = initializeApp(firebaseConfig);
-                window.firestore = getFirestore(window.firebaseApp);
-                window.storage = getStorage(window.firebaseApp);
-            } catch (error) {
-                console.error('Error initializing Firebase:', error);
-                // Handle initialization error appropriately
-            }
-        }
-
-        // Initialize Firebase when the page loads
-        initializeFirebase();
-    </script>
-
     <!-- Role-based protection and authentication -->
     <script type="module">
         import { protectServiceProviderRoute } from '../assets/js/route-protection.js';
@@ -215,6 +189,29 @@
             });
         });
     </script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { getStorage } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-AqqveAk-kUN8qNVhDBdNx0Cd5fFHU1o",
+            authDomain: "economics-project-87f52.firebaseapp.com",
+            projectId: "economics-project-87f52",
+            storageBucket: "economics-project-87f52.appspot.com",
+            messagingSenderId: "485940507853",
+            appId: "1:485940507853:web:95c4e65d0b3b3bfca92584",
+            measurementId: "G-W0P3BP9YK2"
+        };
+
+        // Initialize Firebase
+        window.firebaseApp = initializeApp(firebaseConfig);
+        window.firestore = getFirestore(window.firebaseApp);
+        window.storage = getStorage(window.firebaseApp);
+    </script>
+
     <script src="main.js"></script>
 </body>
 

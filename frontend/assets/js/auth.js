@@ -5,7 +5,16 @@ import { getStorage, ref, uploadString, getDownloadURL } from 'https://www.gstat
 import { sha256 } from './utils.js';
 
 // Firebase configuration
-const firebaseConfig = ;
+const firebaseConfig = {
+    apiKey: "AIzaSyB-AqqveAk-kUN8qNVhDBdNx0Cd5fFHU1o",
+    authDomain: "economics-project-87f52.firebaseapp.com",
+    projectId: "economics-project-87f52",
+    storageBucket: "economics-project-87f52.appspot.com",
+    messagingSenderId: "485940507853",
+    appId: "1:485940507853:web:95c4e65d0b3b3bfca92584",
+    measurementId: "G-W0P3BP9YK2"
+};
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);

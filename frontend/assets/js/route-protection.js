@@ -30,6 +30,7 @@ function protectRoute(allowedRole) {
  */
 function protectServiceProviderRoute() {
   protectRoute('service_provider');
+  console.log('protectServiceProviderRoute');
 }
 
 /**
@@ -37,6 +38,8 @@ function protectServiceProviderRoute() {
  */
 function protectHomeUserRoute() {
   protectRoute('home_user');
+  console.log('protectServiceProviderRoute');
+
 }
 
 /**

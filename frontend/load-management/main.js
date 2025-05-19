@@ -18,7 +18,7 @@ const lightingLoadValue = document.getElementById('lighting-load-value');
 const heaterLoadValue = document.getElementById('heater-load-value');
 const totalLoadValue = document.getElementById('total-load-value');
 
-const token = "h-wpP2eYFG0bxHR3U0dik6jzsC_9xHDb";
+const token = "PV-SPH-oQ5F9hS4qcx9T9f0mP-nceiZH";
 const endpoints = {
   values: {
     ac: `https://blynk.cloud/external/api/get?token=${token}&V0`,

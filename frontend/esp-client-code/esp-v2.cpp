@@ -225,6 +225,7 @@ float updateAndRecalculate()
  **************************************/
 void manageLoads()
 {
+  manualMotorSpeed();
   if (blynkMode)
   {
     // Skip automatic management if in Blynk manual control mode

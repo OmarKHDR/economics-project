@@ -19,6 +19,7 @@ const int lightsRelay = 25; // Digital output to control lights relay
 
 const int potPin = 34; // Potentiometer pin to control speed
 const int enPin = 13;  // pwm conected to enable ENA
+int potValue = 0;
 /**************************************
  * LOAD MANAGEMENT CONFIGURATION
  * Thresholds and variables for the load shedding system
@@ -27,6 +28,7 @@ const float totalThreshold = 7.5;   // Load threshold above which shedding begin
 const float restoreThreshold = 3.0; // Load threshold below which restoration begins
 
 float acValue = 0, heaterValue = 0, lightsValue = 0, totalLoad = 0;
+int motorSpeed = 0;
 
 /**************************************
  * BLYNK CONFIGURATION
@@ -115,6 +117,17 @@ BLYNK_WRITE(V6)
   Serial.print(lightsState);
   Serial.print(", lightsRelay pin -> ");
   Serial.println(lightsRelay);
+}
+
+BLYNK_WRITE(V7)
+{
+  motorSpeed = param.asInt();
+  updatMotorSpeed();
+  Serial.print("blynk handler: ");
+  Serial.print("Motor Speed: V7 -> ");
+  Serial.print(V7);
+  Serial.print(", motorSpeed -> ");
+  Serial.println(motorSpeed);
 }
 
 /**************************************
@@ -212,7 +225,6 @@ float updateAndRecalculate()
  **************************************/
 void manageLoads()
 {
-  updatMotorSpeed();
   if (blynkMode)
   {
     // Skip automatic management if in Blynk manual control mode
@@ -302,13 +314,6 @@ void shedDevice(int relayPin, const char *name, const char *shortName)
   lcd.clear();
 }
 
-/**************************************
- * DEVICE RESTORATION HELPER
- * Turns on a specific device and updates displays
- *
- * @param relayPin The pin connected to the device's relay
- * @param name Full name of the device for displays
- **************************************/
 void restoreDevice(int relayPin, const char *name)
 {
   digitalWrite(relayPin, HIGH);
@@ -325,10 +330,24 @@ void restoreDevice(int relayPin, const char *name)
  * updating fan motor speed
  * change the speed of the motor depending on the voltage reading
  **************************************/
+void manualMotorSpeed()
+{
+  int currentPotValue = analogRead(potPin);
+  if (currentPotValue != potValue)
+  {
+    potValue = currentPotValue;
+    motorSpeed = map(potValue, 0, 4095, 0, 255);
+    updatMotorSpeed();
+  }
+}
+
 void updatMotorSpeed()
 {
-  int potValue = analogRead(potPin);             // Range: 0–4095
-  int pwmValue = map(potValue, 0, 4095, 0, 255); // Map to 0–255
-  analogWrite(enPin, pwmValue);                  // Write PWM to motor
-  Serial.printf("Pot: %d → PWM: %d\n", potValue, pwmValue);
+  motorSpeed = constrain(motorSpeed, 0, 255);
+  analogWrite(enPin, motorSpeed); // Write PWM to motor
+  Serial.printf("Pot: %d → PWM: %d\n", potValue, motorSpeed);
+  // Send updated speed to Blynk
+  Blynk.virtualWrite(V7, motorSpeed);
+  Serial.print("Motor speed updated: Sending to Blynk V7 -> ");
+  Serial.println(motorSpeed);
 }

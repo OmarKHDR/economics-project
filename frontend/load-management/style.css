@@ -238,6 +238,66 @@ main {
   font-size: 24px;
 }
 
+/* Fan control specific styles */
+.fan-control-slider {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.fan-control-slider label {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.fan-control-slider input[type="range"] {
+  width: 100%;
+  height: 4px;
+  appearance: none;
+  background: #d3d3d3;
+  outline: none;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.fan-control-slider input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.fan-control-slider input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.fan-control-slider input[type="range"]:disabled {
+  opacity: 0.5;
+}
+
+.fan-control-slider input[type="range"]:disabled::-webkit-slider-thumb {
+  background: #ccc;
+}
+
+.fan-control-slider input[type="range"]:disabled::-moz-range-thumb {
+  background: #ccc;
+}
+
+.fan-control-slider span {
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
 /* User account picture styles */
 .user-account {
   display: flex;

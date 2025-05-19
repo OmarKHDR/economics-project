@@ -63,6 +63,10 @@
                         <div class="status-led" id="heater-status-led"></div>
                         <span>Heater Load</span>
                     </div>
+                    <div class="status-item">
+                        <div class="status-led" id="fan-status-led"></div>
+                        <span>Fan Load</span>
+                    </div>
                 </div>
             </section>
 
@@ -123,6 +127,31 @@
                             <div class="load-reading">
                                 <span id="heater-load-value">0 W</span>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="load-card" id="fan-card">
+                    <div class="card-header">
+                        <h3>Fan Control</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="fan-toggle" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="card-body">
+                        <div class="load-info">
+                            <div class="load-icon">
+                                <i class="fas fa-fan"></i>
+                            </div>
+                            <div class="load-reading">
+                                <span id="fan-load-value">0 kW</span>
+                            </div>
+                        </div>
+                        <div class="fan-control-slider">
+                            <label for="fan-speed">Speed Control</label>
+                            <input type="range" id="fan-speed" min="0" max="100" value="0" disabled>
+                            <span id="fan-speed-value">0%</span>
                         </div>
                     </div>
                 </div>
